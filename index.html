@@ -109,7 +109,7 @@
                     <h3 class="text-xl font-bold text-gray-700">학습 목표</h3>
                     <ul class="mt-4 text-left list-disc list-inside mx-auto max-w-md space-y-2">
                         <li>신체와 건강에 관련된 낱말과 표현을 익혀요.</li>
-                        <li>사고 상황을 ‘~다가’ 문법으로 말할 수 있어요.</li>
+                        <li>사고 상황을 '~다가' 문법으로 말할 수 있어요.</li>
                         <li>병원에서 사용할 수 있는 표현을 익히고 상황을 설명할 수 있어요.</li>
                     </ul>
                     <p class="mt-6 text-gray-600">아래 활동 카드를 클릭해서 학습을 시작해 보세요!</p>
@@ -150,11 +150,11 @@
                 <h3 class="text-2xl font-bold text-center mb-4 text-orange-700">활동 1: 신체 부위 알아보기</h3>
                 <div class="flex flex-col md:flex-row gap-8">
                     <div class="w-full md:w-1/2 relative">
-                        <img src="https://postfiles.pstatic.net/MjAyNTA3MDFfMTQg/MDAxNzUxMzQ2NjY5MjY3.ZJx9bG2ldDiTGwl-jJuTcnsxXiZkQ-X35XbQtrmI-fkg.BvqROsw1iOqYwVIINHYpieBlEzJeimGAu3UzBQ-MTxkg.PNG/KakaoTalk_20250630_232204713.png?type=w3840" alt="아이 신체 부위 그림" class="w-full h-auto rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/400x600/E0F2F1/333333?text=Image+Not+Found';">
+                        <img src="https://github.com/yongjun333/digital-textbook/blob/main/KakaoTalk_20250630_232204713.png?raw=true" alt="아이 신체 부위 그림" class="w-full h-auto rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/400x600/E0F2F1/333333?text=Image+Not+Found';">
                         <div class="hotspot" style="top: 5%; left: 45%;" onclick="speakAndShow('머리', 'word-display')"></div>
-                        <div class="hotspot" style="top: 22%; left: 28%;" onclick="speakAndShow('어깨', 'word-display')"></div>
-                        <div class="hotspot" style="top: 40%; left: 48%;" onclick="speakAndShow('배', 'word-display')"></div>
-                        <div class="hotspot" style="top: 65%; left: 42%;" onclick="speakAndShow('무릎', 'word-display')"></div>
+                        <div class="hotspot" style="top: 32%; left: 28%;" onclick="speakAndShow('어깨', 'word-display')"></div>
+                        <div class="hotspot" style="top: 50%; left: 48%;" onclick="speakAndShow('배', 'word-display')"></div>
+                        <div class="hotspot" style="top: 75%; left: 42%;" onclick="speakAndShow('무릎', 'word-display')"></div>
                         <div class="hotspot" style="top: 90%; left: 48%;" onclick="speakAndShow('발', 'word-display')"></div>
                     </div>
                     <div class="w-full md:w-1/2">
@@ -215,8 +215,8 @@
                 <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">활동 3: 병원과 치료</h3>
                 
                 <div class="mb-6 bg-white p-4 rounded-lg shadow">
-                    <h4 class="text-lg font-bold">🎙️ 의사에게 말해보기 (GPT 발음 평가)</h4>
-                    <p class="mt-2">"배가 아파요." 라고 말해보세요. GPT가 발음을 평가해 줄 거예요.</p>
+                    <h4 class="text-lg font-bold">🎙️ 의사에게 말해보기 </h4>
+                    <p class="mt-2">"배가 아파요." 라고 말해보세요.</p>
                     <button id="mic-btn-hospital" class="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600" onclick="startPronunciationTest('mic-btn-hospital', 'pron-feedback-hospital', '배가 아파요', 'pron-feedback-details-hospital')">말하기 시작</button>
                     <p id="pron-feedback-hospital" class="mt-2 text-center font-semibold"></p>
                     <div id="pron-feedback-details-hospital" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -274,7 +274,7 @@
                 </div>
                 <div id="symptom-display" class="mt-4 text-center text-2xl font-bold text-red-600 h-12"></div>
                 <div class="mt-6 bg-white p-4 rounded-lg shadow">
-                    <h4 class="text-lg font-bold">🎙️ 증상 말하기 (GPT 발음 평가)</h4>
+                    <h4 class="text-lg font-bold">🎙️ 증상 말하기</h4>
                     <p class="mt-2">아래 증상 버튼을 누르고, 따라 말해보세요.</p>
                     <div id="symptom-buttons" class="flex gap-2 justify-center mt-2 flex-wrap">
                         <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '열이 나요')">열이 나요</button>
@@ -308,7 +308,7 @@
                              <div class="bg-blue-200 p-3 rounded-lg">
                                 <p id="patient-dialogue">운동장에서 ________ 넘어졌어요.</p>
                              </div>
-                             <img src="https://media.istockphoto.com/id/1216853388/ko/%EC%82%AC%EC%A7%84/%EC%87%BC%ED%95%91%EB%AA%B0%EC%97%90%EC%84%9C-%ED%9C%A0%EC%B2%B4%EC%96%B4%EC%97%90-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%9E%91%EC%9D%80-%EC%86%8C%EB%85%84.jpg?s=612x612&w=0&k=20&c=DZb_R_K7QP8D06bo7WSSvKxhVUURTybA50g8TEKKI54=" class="rounded-full w-24 h-24 object-cover" alt="환자 이미지" onerror="this.onerror=null;this.src='https://placehold.co/100x100/FEF9C3/333?text=Image+Error';">
+                             <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDA0MDRfMTk5%2FMDAxNzEyMjA5ODc4NTg4.MK1JnvOUyIFBQogIkTAXkCOWZU17aZ_1B4nU4mKOuR4g.ESik_mUuKEnUY57ezMOEzd5o-r1RJqmo3fgzWOr7Ejcg.PNG%2F222222.png&type=sc960_832" class="rounded-full w-24 h-24 object-cover cursor-pointer border-4 border-transparent hover:border-green-500" alt="운동장에서 넘어진 사진" onclick="checkHospitalAnswer('correct')">
                         </div>
                     </div>
                     <div class="mt-4 text-center">
@@ -338,7 +338,7 @@
                             <p class="font-semibold mt-2">정형외과</p>
                         </div>
                         <div class="text-center">
-                            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDAxMDZfMTky%2FMDAxNzA0NTUxMzQwNDg0.znQH0fK2dTK_EjfgJihuWgxrQFKBwmBEHN0vli8fU2cg.AInc4xI9QWhdNy-WKPsIF1DtUFr4WfjDRve5ATliyTIg.JPEG.myh2xr9zhxqxesa%2F12.jpg&type=sc960_832" class="rounded-lg cursor-pointer border-4 border-transparent hover:border-green-500 w-full h-32 object-cover" alt="내과 이미지" onclick="checkHospitalAnswer('correct')">
+                            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDAxMDZfMTky%2FMDAxNzA0NTUxMzQwNDg0.znQH0fK2dTK_EjfgJihuWgxrQFKBwmBEHN0vli8fU2cg.AInc4xI9QWhdNy-WKPsIF1DtUFr4WfjDRve5ATliyTIg.JPEG.myh2xr9zhxqxesa%2F12.jpg&type=sc960_832" class="rounded-lg cursor-pointer border-4 border-transparent hover:border-green-500 w-full h-32 object-cover object-contain" alt="내과 이미지" onclick="checkHospitalAnswer('correct')">
                             <p class="font-semibold mt-2">내과</p>
                         </div>
                         <div class="text-center">
@@ -350,7 +350,7 @@
                 <p id="hospital-feedback" class="mt-4 text-center h-6 font-bold text-xl"></p>
                 
                 <div class="mt-8 bg-white p-4 rounded-lg shadow">
-                    <h4 class="text-lg font-bold">나만의 문장 만들기 (GPT와 대화하기)</h4>
+                    <h4 class="text-lg font-bold">나만의 문장 만들기</h4>
                     <p class="mt-2 text-gray-600">자신이 아팠던 경험을 아래에 써보거나 마이크 버튼을 눌러 말해보세요.</p>
                     <div id="chat-container" class="mt-4 border rounded-lg p-4 h-64 overflow-y-auto bg-gray-50 flex flex-col gap-4">
                         <!-- Chat messages will be appended here -->
@@ -480,17 +480,18 @@
 
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                const cleanedTranscript = transcript.replace(/[\s.,?!]/g, '');
-                const cleanedCorrectText = correctText.replace(/[\s.,?!]/g, '');
+                // 모든 공백, 마침표, 쉼표, 특수문자 제거 + 소문자 통일
+                const cleanedTranscript = transcript.replace(/[\s.,?!]/g, '').toLowerCase().trim();
+                const cleanedCorrectText = correctText.replace(/[\s.,?!]/g, '').toLowerCase().trim();
 
                 const allFeedbackOptions = {
                     '배가 아파요': [
                         { type: 'bae_error', message: '🤔 거의 맞았어요! "배" 발음만 조금 더 연습해볼까요?', mouthTip: '👄 **입 모양:** "배"를 말할 때, 입술을 양옆으로 살짝 당겨서 미소 짓는 것처럼 해보세요.', tongueTip: '👅 **혀 위치:** 혀끝을 아랫니 뒤에 가볍게 대고 발음해 보세요.'},
-                        { type: 'a_error', message: '🤔 아쉬워요! "아파요"의 "아" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** "아"를 말할 때, 입을 동그랗게 크게 벌려주세요.', tongueTip: '👅 **혀 위치:** 혀를 아래로 편안하게 내려놓고 소리를 내보세요.'}
+                        { type: 'a_error', message: '🤔 아쉬워요! "아파요"의 "아" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** "아"를 말할 때, 입을 동그랗게 크게 벌려주세요.', tongueTip: '👅 **혀 위치:** 혀를 아래로 편안하게 내려놓고 소리를 내보세요.'},
                     ],
                     '기침이 나요': [
                         { type: 'gi_error', message: '🤔 "기침"의 "기" 발음이 조금 아쉬워요.', mouthTip: '👄 **입 모양:** 입술을 살짝 벌리고, 혀의 뒷부분을 입천장 뒤쪽에 붙였다 떼면서 소리를 내보세요.', tongueTip: '👅 **혀 위치:** 혀의 뒷부분(어금니 쪽)을 연구개(말랑한 입천장)에 붙였다가 터뜨리듯 발음해요.'},
-                        { type: 'chim_error', message: '🤔 "기침"의 "침" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** 발음이 끝날 때 입술을 자연스럽게 닫아주세요.', tongueTip: '👅 **혀 위치:** 혀끝을 윗잇몸 뒤쪽에 붙여서 소리를 만들어요.'}
+                        { type: 'chim_error', message: '🤔 "기침"의 "침" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** 발음이 끝날 때 입술을 자연스럽게 닫아주세요.', tongueTip: '👅 **혀 위치:** 혀끝을 윗잇몸 뒤쪽에 붙여서 소리를 만들어요.'},
                     ],
                     '열이 나요': [
                         { type: 'yeol_error', message: '🤔 "열" 발음이 조금 아쉬워요.', mouthTip: '👄 **입 모양:** 입술을 동그랗게 앞으로 내밀었다가 옆으로 벌려주세요.', tongueTip: '👅 **혀 위치:** 혀끝을 윗잇몸에 붙였다가 떼면서 발음해요.'}
@@ -533,7 +534,7 @@
                     feedbackEl.textContent = '음성을 인식하지 못했어요. 다시 시도해 주세요.';
                     feedbackEl.className = "mt-2 text-center font-semibold text-red-500";
                 }
-                 button.classList.remove('mic-active');
+                button.classList.remove('mic-active');
                 button.textContent = '다시 말하기';
                 button.disabled = false;
             };
@@ -731,7 +732,6 @@
             
             recognition.start();
         });
-
 
     </script>
 </body>
