@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디지털 교과서 프로토타입 - 1과: 뛰다가 넘어졌어요</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .activity-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* 활성화된 탭 스타일 */
+        .tab-active {
+            border-color: #3B82F6;
+            color: #3B82F6;
+            font-weight: bold;
+            background-color: #EFF6FF;
+        }
+        /* 숨겨진 화면 스타일 */
+        .hidden-screen {
+            display: none;
+        }
+        /* 말하기 버튼 애니메이션 */
+        .mic-active {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        /* 신체 부위 핫스팟 */
+        .hotspot {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 165, 0, 0.7);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hotspot:hover {
+            background-color: rgba(255, 140, 0, 1);
+            transform: scale(1.2);
+        }
+        /* 드래그 앤 드롭 스타일 */
+        .drop-zone-highlight {
+            background-color: #E0F2FE;
+            border-color: #0284C7;
+        }
+        .draggable-card {
+            cursor: grab;
+        }
+        .draggable-card:active {
+            cursor: grabbing;
+        }
+        /* 정답/오답 효과 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .shake-error {
+            animation: shake 0.4s ease-in-out;
+        }
+        .drop-zone-success {
+            border-color: #22C55E !important;
+            background-color: #F0FDF4;
+        }
+        .drop-zone-fail {
+            border-color: #EF4444 !important;
+            background-color: #FEF2F2;
+        }
+        .symptom-btn-selected {
+            background-color: #F87171;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto p-4 max-w-5xl bg-white shadow-lg rounded-lg mt-5">
+        
+        <!-- 헤더: 단원 제목 -->
+        <header class="text-center p-4 border-b-2 border-blue-500">
+            <h1 class="text-3xl font-bold text-gray-800">표준 한국어 디지털 교과서</h1>
+            <h2 class="text-2xl font-semibold text-blue-600 mt-2">1단원: 뛰다가 넘어졌어요</h2>
+        </header>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main id="main-content" class="p-4">
+            <!-- 초기 화면 -->
+            <div id="intro-screen">
+                <div class="bg-blue-50 p-6 rounded-lg text-center">
+                    <h3 class="text-xl font-bold text-gray-700">학습 목표</h3>
+                    <ul class="mt-4 text-left list-disc list-inside mx-auto max-w-md space-y-2">
+                        <li>신체와 건강에 관련된 낱말과 표현을 익혀요.</li>
+                        <li>사고 상황을 '~다가' 문법으로 말할 수 있어요.</li>
+                        <li>병원에서 사용할 수 있는 표현을 익히고 상황을 설명할 수 있어요.</li>
+                    </ul>
+                    <p class="mt-6 text-gray-600">아래 활동 카드를 클릭해서 학습을 시작해 보세요!</p>
+                </div>
+
+                <!-- 활동 선택 카드 -->
+                <div class="grid md:grid-cols-3 gap-6 mt-8">
+                    <div class="activity-card bg-orange-100 p-6 rounded-lg text-center" onclick="showScreen('body-parts')">
+                        <h4 class="text-xl font-bold text-orange-800">1. 신체 부위</h4>
+                        <p class="mt-2 text-orange-700">우리 몸의 각 부분 이름을 배워요.</p>
+                    </div>
+                    <div class="activity-card bg-green-100 p-6 rounded-lg text-center" onclick="showScreen('grammar-daga')">
+                        <h4 class="text-xl font-bold text-green-800">2. 문법: ~다가</h4>
+                        <p class="mt-2 text-green-700">무슨 일이 있었는지 설명해요.</p>
+                    </div>
+                    <div class="activity-card bg-indigo-100 p-6 rounded-lg text-center" onclick="showScreen('hospital-treatment')">
+                        <h4 class="text-xl font-bold text-indigo-800">3. 병원과 치료</h4>
+                        <p class="mt-2 text-indigo-700">아플 때 어떻게 하는지 알아봐요.</p>
+                    </div>
+                     <div class="activity-card bg-red-100 p-6 rounded-lg text-center" onclick="showScreen('cold-symptoms')">
+                        <h4 class="text-xl font-bold text-red-800">4. 감기 증상</h4>
+                        <p class="mt-2 text-red-700">감기에 걸렸을 때 증상을 말해요.</p>
+                    </div>
+                    <div class="activity-card bg-yellow-100 p-6 rounded-lg text-center" onclick="showScreen('review-activity')">
+                        <h4 class="text-xl font-bold text-yellow-800">5. 종합 활동</h4>
+                        <p class="mt-2 text-yellow-700">배운 내용을 복습해요.</p>
+                    </div>
+                    <div class="activity-card bg-purple-100 p-6 rounded-lg text-center" onclick="showScreen('hospital-play')">
+                        <h4 class="text-xl font-bold text-purple-800">6. 병원 놀이</h4>
+                        <p class="mt-2 text-purple-700">어디가 아플 때 어느 병원에 갈까요?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 각 활동 화면 (초기에는 숨김) -->
+            <div id="body-parts" class="hidden-screen">
+                <button class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onclick="showScreen('intro-screen')">← 처음으로</button>
+                <h3 class="text-2xl font-bold text-center mb-4 text-orange-700">활동 1: 신체 부위 알아보기</h3>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="w-full md:w-1/2 relative">
+                        <img src="https://postfiles.pstatic.net/MjAyNTA3MDFfMTQg/MDAxNzUxMzQ2NjY5MjY3.ZJx9bG2ldDiTGwl-jJuTcnsxXiZkQ-X35XbQtrmI-fkg.BvqROsw1iOqYwVIINHYpieBlEzJeimGAu3UzBQ-MTxkg.PNG/KakaoTalk_20250630_232204713.png?type=w3840" alt="아이 신체 부위 그림" class="w-full h-auto rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/400x600/E0F2F1/333333?text=Image+Not+Found';">
+                        <div class="hotspot" style="top: 5%; left: 45%;" onclick="speakAndShow('머리', 'word-display')"></div>
+                        <div class="hotspot" style="top: 22%; left: 28%;" onclick="speakAndShow('어깨', 'word-display')"></div>
+                        <div class="hotspot" style="top: 40%; left: 48%;" onclick="speakAndShow('배', 'word-display')"></div>
+                        <div class="hotspot" style="top: 65%; left: 42%;" onclick="speakAndShow('무릎', 'word-display')"></div>
+                        <div class="hotspot" style="top: 90%; left: 48%;" onclick="speakAndShow('발', 'word-display')"></div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <p class="text-lg font-semibold text-center">그림의 동그라미를 누르면 소리가 나요.</p>
+                            <div id="word-display" class="mt-4 text-center text-3xl font-bold text-orange-600 h-12"></div>
+                        </div>
+                        <div class="mt-6 bg-white p-4 rounded-lg shadow">
+                            <h4 class="text-lg font-bold">🎵 노래 따라 부르기</h4>
+                            <p class="mt-2">"머리 어깨 무릎 발" 노래를 따라 불러봐요!</p>
+                            <div class="mt-4 aspect-w-16 aspect-h-11">
+                               <iframe class="w-full h-full rounded-lg" src="https://www.youtube.com/embed/hHBo6QTr2u4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="grammar-daga" class="hidden-screen">
+                <button class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onclick="showScreen('intro-screen')">← 처음으로</button>
+                <h3 class="text-2xl font-bold text-center mb-4 text-green-700">활동 2: 문법 '~다가'</h3>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-lg">사고 이유 애니메이션</h4>
+                    <p>상황을 보고 어떤 일이 있었는지 말해봐요.</p>
+                    <div id="animation-container" class="mt-4 flex flex-col items-center bg-white p-4 rounded shadow">
+                         <img id="animation-img" src="https://placehold.co/500x300/FFFBEB/333?text=Image" alt="애니메이션 장면" class="hidden rounded-lg mb-4 max-w-full md:max-w-xl mx-auto h-auto">
+                         <div id="animation-youtube-container" class="hidden aspect-w-16 aspect-h-11 w-full md:max-w-xl mx-auto mb-4">
+                            <iframe id="animation-youtube" class="w-full h-full rounded-lg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                         </div>
+                         <p id="animation-text" class="text-xl font-bold text-green-800"></p>
+                    </div>
+                    <div class="flex justify-center gap-2 mt-4 flex-wrap">
+                        <button class="bg-green-200 px-3 py-1 rounded-full text-sm" onclick="showAnimation(0)">라면 끓이다가</button>
+                        <button class="bg-green-200 px-3 py-1 rounded-full text-sm" onclick="showAnimation(1)">철봉에 매달리다가</button>
+                    </div>
+                </div>
+                <div class="mt-6 bg-white p-4 rounded-lg shadow">
+                    <h4 class="text-lg font-bold">✍️ 문장 만들기 (드래그 앤 드롭)</h4>
+                    <p class="mt-2">아래 카드를 회색 상자로 끌어다 놓아 문장을 완성해 보세요.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-around gap-4 mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div id="card-container" class="flex flex-row md:flex-col gap-4">
+                            <div id="drag1" class="draggable-card border-2 p-4 rounded-lg bg-white shadow" draggable="true">자전거를 타다</div>
+                            <div id="drag2" class="draggable-card border-2 p-4 rounded-lg bg-white shadow" draggable="true">돌과 부딪히다</div>
+                        </div>
+                        <div id="drop-zone" class="w-full md:w-1/2 h-24 border-4 border-dashed rounded-lg flex items-center justify-center text-gray-400 transition-colors">
+                            여기에 카드를 놓으세요
+                        </div>
+                    </div>
+                    <p id="dnd-feedback" class="mt-4 text-center text-xl font-bold h-8"></p>
+                    <div class="text-center mt-2">
+                      <button id="reset-dnd-btn" class="hidden bg-gray-400 text-white py-1 px-3 rounded" onclick="resetDragAndDrop()">다시하기</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hospital-treatment" class="hidden-screen">
+                <button class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onclick="showScreen('intro-screen')">← 처음으로</button>
+                <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">활동 3: 병원과 치료</h3>
+                
+                <div class="mb-6 bg-white p-4 rounded-lg shadow">
+                    <h4 class="text-lg font-bold">🎙️ 의사에게 말해보기 (GPT 발음 평가)</h4>
+                    <p class="mt-2">"배가 아파요." 라고 말해보세요. GPT가 발음을 평가해 줄 거예요.</p>
+                    <button id="mic-btn-hospital" class="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600" onclick="startPronunciationTest('mic-btn-hospital', 'pron-feedback-hospital', '배가 아파요', 'pron-feedback-details-hospital')">말하기 시작</button>
+                    <p id="pron-feedback-hospital" class="mt-2 text-center font-semibold"></p>
+                    <div id="pron-feedback-details-hospital" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h5 class="font-bold text-blue-800">💡 발음 팁!</h5>
+                        <p id="feedback-tip-mouth" class="mt-2 text-blue-700 flex items-center"></p>
+                        <p id="feedback-tip-tongue" class="mt-2 text-blue-700 flex items-center"></p>
+                    </div>
+                </div>
+
+                 <div class="bg-indigo-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-lg">어떻게 치료할까요?</h4>
+                    <p>상황에 맞는 치료 방법을 알아봐요.</p>
+                    <div class="grid md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-white p-3 rounded-lg shadow text-center" onclick="speakAndShow('밥을 먹은 다음에 이를 닦아요', 'treatment-display')">
+                            <img src="https://media.istockphoto.com/id/147306151/ko/%EC%82%AC%EC%A7%84/%EC%95%84%EB%A7%90%EA%B0%90-%EC%B6%A9%EC%A0%84.jpg?s=612x612&w=0&k=20&c=EY0Dn-Cr_4IR_Z5J4M9Zmu-uxnZ7uCN6AKySVpXJmHA=" class="mx-auto rounded w-full h-36 object-cover" alt="충치 그림" onerror="this.onerror=null;this.src='https://placehold.co/200x150/F3E8FF/333?text=Image+Error';">
+                            <p class="mt-2 font-semibold">충치가 생겼어요</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow text-center" onclick="speakAndShow('하루에 두 번 안약을 넣어요', 'treatment-display')">
+                            <img src="https://media.istockphoto.com/id/1257274991/ko/%EC%82%AC%EC%A7%84/%EB%B6%89%EC%9D%80-%ED%8C%8C%EC%97%B4-%ED%98%88%EA%B4%80%EC%9D%84-%EA%B0%80%EC%A7%84-%EB%AF%B8%EC%B7%A8%ED%95%99-%EC%95%84%EB%8F%99-%EC%86%8C%EB%85%84-%EB%88%88%EC%97%90-%ED%98%88%EA%B4%80-%EA%B2%B0%EB%A7%89%EC%97%BC-%EB%88%88%EC%9D%98-%EC%99%B8%EC%83%81-%EC%97%BC%EC%A6%9D-%EA%B0%90%EC%97%BC-%EC%95%8C%EB%A0%88%EB%A5%B4%EA%B8%B0-%EB%98%90%EB%8A%94-%EC%95%88%EA%B5%AC-%EC%95%95%EB%A0%A5%EC%9D%80-%EC%95%88%EA%B3%BC-%EC%9D%98%EC%82%AC%EC%99%80-%EC%A0%91%EC%B4%89%ED%95%98%EB%8A%94-%EC%9D%B4%EC%9C%A0%EC%9E%85%EB%8B%88%EB%8B%A4.jpg?s=612x612&w=0&k=20&c=ZFBpsbIi_cU3nEPc3EFthZPPSWO24ku1lMydz_Gft2U=" class="mx-auto rounded w-full h-36 object-cover" alt="눈병 그림" onerror="this.onerror=null;this.src='https://placehold.co/200x150/F3E8FF/333?text=Image+Error';">
+                            <p class="mt-2 font-semibold">눈병에 걸렸어요</p>
+                        </div>
+                    </div>
+                    <div id="treatment-display" class="mt-4 text-center text-xl font-bold text-indigo-600 h-12"></div>
+                </div>
+                <div class="mt-6 bg-white p-4 rounded-lg shadow">
+                    <h4 class="text-lg font-bold">💊 약 봉투 읽기</h4>
+                    <p class="mt-2">약 봉투를 클릭해서 어떻게 먹는지 들어보세요.</p>
+                    <div class="flex justify-center mt-4">
+                        <img src="https://media.istockphoto.com/id/1169928112/ko/%EC%82%AC%EC%A7%84/%EC%9D%98%EC%82%AC-%EB%98%90%EB%8A%94-%EC%9D%98%EC%82%AC%EB%8A%94-%EB%82%A8%EC%84%B1-%ED%99%98%EC%9E%90-%EB%B3%91%EC%9B%90-%EB%B0%8F-%EC%9D%98%ED%95%99-%EA%B0%9C%EB%85%90%EC%97%90-%EC%95%8C-%EC%95%BD-%EC%9D%98%EB%A3%8C-%EC%B2%98%EB%B0%A9%EC%A0%84%EC%9D%84-%EA%B6%8C%EC%9E%A5-%ED%95%A9%EB%8B%88%EB%8B%A4.jpg?s=612x612&w=0&k=20&c=xRWlily0jtAb4LpQgZlTs4wU9jlv-oKuRaSKGe2gyTY=" class="rounded-lg cursor-pointer h-48 object-contain" alt="약 봉투" onerror="this.onerror=null;this.src='https://placehold.co/200x300/EDE9FE/333?text=Image+Error';" onclick="speakAndShow('이 약은 하루에 세 번, 식사 후 30분 뒤에 드세요.', 'medicine-instruction')">
+                    </div>
+                    <p id="medicine-instruction" class="mt-4 text-center font-semibold text-indigo-700 h-8"></p>
+                </div>
+            </div>
+            
+            <div id="cold-symptoms" class="hidden-screen">
+                <button class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onclick="showScreen('intro-screen')">← 처음으로</button>
+                <h3 class="text-2xl font-bold text-center mb-4 text-red-700">활동 4: 감기 증상</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-red-50 p-4 rounded-lg text-center" onclick="speakAndShow('열이 나요', 'symptom-display')">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDEyMTRfMjg3%2FMDAxNzM0MTMxOTg4MDMz.fqROXg_VwjWgjG8mt550kKvHEeS0SwTfzoFipYxFqHkg.SkNFl3XKJLNQrbMCUlsHUESKr_e2rTF0NGWXG23-RzEg.JPEG%2F%25BE%25EE%25B8%25B0%25C0%25CC_%25B0%25ED%25BF%25AD.jpg&type=sc960_832" class="mx-auto rounded-full w-32 h-32 object-cover" alt="열이 나는 그림" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FEE2E2/333?text=Image+Error';">
+                        <p class="mt-2 font-bold">열이 나요</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg text-center" onclick="speakAndShow('콧물이 나요', 'symptom-display')">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDAxMDJfMjE1%2FMDAxNzA0MTcyMDIxMjcw.NzeSETFd9P_qhm3gRo1hWqod0bu5F-bhAZNdX-Sg2Agg.KRHPiW5b-g3gyFBZzWj6AJIx2BSN6tf1GEUaWtxOwE8g.JPEG.andudtk12%2F20240102_140452.jpg&type=sc960_832" class="mx-auto rounded-full w-32 h-32 object-cover" alt="콧물이 나는 그림" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FEE2E2/333?text=Image+Error';">
+                        <p class="mt-2 font-bold">콧물이 나요</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg text-center" onclick="speakAndShow('기침이 나요', 'symptom-display')">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxOTExMjZfNTYg%2FMDAxNTc0NzQ3NDM2NzEw.DWsm6zwYTeAcKVOp2mxqrBNwVZaJqkUFCCVj1OPlINkg.Ii0TKY3Mgwg_ABChKgWr0C_jUaP2VjOnQV8Ri0wfbeYg.JPEG.pinokio2019%2Ftica101g19051403.jpg&type=sc960_832" class="mx-auto rounded-full w-32 h-32 object-cover" alt="기침이 나는 그림" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FEE2E2/333?text=Image+Error';">
+                        <p class="mt-2 font-bold">기침이 나요</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg text-center" onclick="speakAndShow('추워요', 'symptom-display')">
+                        <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzExMjhfMjE3%2FMDAxNzAxMTM3NDg3MTMx.HkXjh8Djv0Oz4MV55E2KmFV0z6YGMJ3LHhlmKMZmsr0g._KHXJgMfalz2GUn2srGgAAv3ZFQTiX9ZBENoRk6yPecg.PNG.rental-day%2F%25C8%25AD%25C0%25E5%25BD%25C7%25C3%25DF%25BF%25F6.PNG&type=sc960_832" class="mx-auto rounded-full w-32 h-32 object-cover" alt="추워하는 그림" onerror="this.onerror=null;this.src='https://placehold.co/150x150/FEE2E2/333?text=Image+Error';">
+                        <p class="mt-2 font-bold">추워요</p>
+                    </div>
+                </div>
+                <div id="symptom-display" class="mt-4 text-center text-2xl font-bold text-red-600 h-12"></div>
+                <div class="mt-6 bg-white p-4 rounded-lg shadow">
+                    <h4 class="text-lg font-bold">🎙️ 증상 말하기 (GPT 발음 평가)</h4>
+                    <p class="mt-2">아래 증상 버튼을 누르고, 따라 말해보세요.</p>
+                    <div id="symptom-buttons" class="flex gap-2 justify-center mt-2 flex-wrap">
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '열이 나요')">열이 나요</button>
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '콧물이 나요')">콧물이 나요</button>
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '기침이 나요')">기침이 나요</button>
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '추워요')">추워요</button>
+                    </div>
+                    <p id="selected-symptom" class="text-center font-bold text-blue-600 my-2 h-6"></p>
+                    <button id="mic-btn-symptom" class="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600" disabled>먼저 증상을 선택하세요</button>
+                    <p id="pron-feedback-symptom" class="mt-2 text-center font-semibold"></p>
+                    <div id="pron-feedback-details-symptom" class="hidden mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                        <h5 class="font-bold text-red-800">💡 발음 팁!</h5>
+                        <p id="feedback-tip-mouth-symptom" class="mt-2 text-red-700 flex items-center"></p>
+                        <p id="feedback-tip-tongue-symptom" class="mt-2 text-red-700 flex items-center"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="review-activity" class="hidden-screen">
+                <button class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onclick="showScreen('intro-screen')">← 처음으로</button>
+                <h3 class="text-2xl font-bold text-center mb-4 text-yellow-700">활동 5: 종합 활동</h3>
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-lg">의사-환자 역할 대화</h4>
+                    <p>그림을 보고 대화를 완성해 보세요.</p>
+                    <div class="mt-4 bg-white p-4 rounded shadow">
+                        <div class="flex gap-4 items-center">
+                            <img src="https://media.istockphoto.com/id/1470505351/ko/%EC%82%AC%EC%A7%84/%EC%82%AC%EB%AC%B4%EC%8B%A4%EC%97%90%EC%84%9C-%EC%95%88%EA%B2%BD%EA%B3%BC-%ED%9C%B4%EB%8C%80%ED%8F%B0%EC%9D%84-%EB%93%A4%EA%B3%A0-%EC%9B%83%EA%B3%A0-%EC%9E%88%EB%8A%94-%EC%9D%98%EC%82%AC%EC%9D%98-%EC%B4%88%EC%83%81%ED%99%94.jpg?s=612x612&w=0&k=20&c=orBiaKPOpN35UXHgbrhHVZgo_ekXJKnPFN_0jMNPDAY=" class="rounded-full w-24 h-24 object-cover" alt="의사 이미지" onerror="this.onerror=null;this.src='https://placehold.co/100x100/FEF9C3/333?text=Image+Error';">
+                            <p class="bg-gray-200 p-3 rounded-lg">어디가 아파요?</p>
+                        </div>
+                        <div class="flex gap-4 items-center mt-4 justify-end">
+                             <div class="bg-blue-200 p-3 rounded-lg">
+                                <p id="patient-dialogue">운동장에서 ________ 넘어졌어요.</p>
+                             </div>
+                             <img src="https://media.istockphoto.com/id/1216853388/ko/%EC%82%AC%EC%A7%84/%EC%87%BC%ED%95%91%EB%AA%B0%EC%97%90%EC%84%9C-%ED%9C%AA%EC%B2%B4%EC%96%B4%EC%97%90-%EA%B7%80%EC%97%AC%EC%9A%B4-%EC%9E%91%EC%9D%80-%EC%86%8C%EB%85%84.jpg?s=612x612&w=0&k=20&c=DZb_R_K7QP8D06bo7WSSvKxhVUURTybA50g8TEKKI54=" class="rounded-full w-24 h-24 object-cover" alt="환자 이미지" onerror="this.onerror=null;this.src='https://placehold.co/100x100/FEF9C3/333?text=Image+Error';">
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <p class="font-semibold">빈 칸에 들어갈 낱말 카드를 고르세요.</p>
+                        <div class="flex gap-2 justify-center mt-2">
+                            <button class="bg-yellow-200 p-2 rounded" onclick="fillBlank('뛰다가')">뛰다가</button>
+                            <button class="bg-yellow-200 p-2 rounded" onclick="fillBlank('먹다가')">먹다가</button>
+                            <button class="bg-yellow-200 p-2 rounded" onclick="fillBlank('자다가')">자다가</button>
+                        </div>
+                        <p id="review-feedback" class="mt-2 h-6 font-bold"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hospital-play" class="hidden-screen">
+                <button class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onclick="showScreen('intro-screen')">← 처음으로</button>
+                <h3 class="text-2xl font-bold text-center mb-4 text-purple-700">활동 6: 병원 놀이</h3>
+                <p class="text-center mb-4">아래 증상이 있을 때 어느 병원에 가야 할까요? 맞는 병원 그림을 클릭하세요.</p>
+                <div class="flex flex-col items-center gap-4 bg-purple-50 p-4 rounded-lg">
+                    <div class="aspect-w-16 aspect-h-9 w-full max-w-sm">
+                        <iframe class="w-full h-full rounded-lg" src="https://www.youtube.com/embed/X2j2rGycr2s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <span class="text-2xl font-bold transform rotate-90 md:rotate-0">→</span>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <img src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20200725_15%2F1595651983026cqm02_JPEG%2FuTTOte10FImEaLEn3bqTII7L.jpg&type=a340" class="rounded-lg cursor-pointer border-4 border-transparent hover:border-red-500 w-full h-32 object-cover" alt="정형외과 이미지" onclick="checkHospitalAnswer('wrong')">
+                            <p class="font-semibold mt-2">정형외과</p>
+                        </div>
+                        <div class="text-center">
+                            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDAxMDZfMTky%2FMDAxNzA0NTUxMzQwNDg0.znQH0fK2dTK_EjfgJihuWgxrQFKBwmBEHN0vli8fU2cg.AInc4xI9QWhdNy-WKPsIF1DtUFr4WfjDRve5ATliyTIg.JPEG.myh2xr9zhxqxesa%2F12.jpg&type=sc960_832" class="rounded-lg cursor-pointer border-4 border-transparent hover:border-green-500 w-full h-32 object-cover" alt="내과 이미지" onclick="checkHospitalAnswer('correct')">
+                            <p class="font-semibold mt-2">내과</p>
+                        </div>
+                        <div class="text-center">
+                            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNTA1MTBfMjc1%2FMDAxNzQ2ODc1NzU1ODM4.wsDGZ_ob-0IzLgYkW18VysomP5KQl1-4ndobO4nXjpgg.D_7LSfwf-env4SyIo4CgRLH9fT4P7Qdo5Y7lennsw2cg.PNG%2F1.PNG&type=a340" class="rounded-lg cursor-pointer border-4 border-transparent hover:border-red-500 w-full h-32 object-cover" alt="이비인후과 이미지" onclick="checkHospitalAnswer('wrong')">
+                            <p class="font-semibold mt-2">이비인후과</p>
+                        </div>
+                    </div>
+                </div>
+                <p id="hospital-feedback" class="mt-4 text-center h-6 font-bold text-xl"></p>
+                
+                <div class="mt-8 bg-white p-4 rounded-lg shadow">
+                    <h4 class="text-lg font-bold">나만의 문장 만들기 (GPT와 대화하기)</h4>
+                    <p class="mt-2 text-gray-600">자신이 아팠던 경험을 아래에 써보거나 마이크 버튼을 눌러 말해보세요.</p>
+                    <div id="chat-container" class="mt-4 border rounded-lg p-4 h-64 overflow-y-auto bg-gray-50 flex flex-col gap-4">
+                        <!-- Chat messages will be appended here -->
+                        <div class="flex justify-start">
+                            <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-xs">
+                                안녕하세요! 언제, 어디가 아팠는지 이야기해 줄래요?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="text" id="user-chat-input" class="flex-grow border rounded-lg p-2" placeholder="여기에 입력하세요...">
+                        <button id="chat-send-btn" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600">전송</button>
+                        <button id="chat-mic-btn" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let currentScreen = 'intro-screen';
+        const synth = window.speechSynthesis;
+
+        function showScreen(screenId) {
+            document.getElementById(currentScreen).classList.add('hidden-screen');
+            document.getElementById(screenId).classList.remove('hidden-screen');
+            currentScreen = screenId;
+            if (screenId === 'grammar-daga') {
+                resetDragAndDrop();
+            }
+        }
+
+        function speakAndShow(text, displayId) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+            utterance.pitch = 1;
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+
+            if (displayId) {
+                document.getElementById(displayId).textContent = text;
+            }
+        }
+
+        const animations = [
+            { type: 'youtube', src: 'https://www.youtube.com/embed/3Hfub9JADj4', text: '라면을 끓이다가 손을 데었어요.' },
+            { type: 'youtube', src: 'https://www.youtube.com/embed/ajbQlHnz6nc', text: '철봉에 매달리다가 떨어졌어요.' }
+        ];
+
+        function showAnimation(index, playSound = true) {
+            const animationData = animations[index];
+            const imgElement = document.getElementById('animation-img');
+            const youtubeContainer = document.getElementById('animation-youtube-container');
+            const youtubeIframe = document.getElementById('animation-youtube');
+            const textElement = document.getElementById('animation-text');
+
+            imgElement.classList.add('hidden');
+            youtubeContainer.classList.add('hidden');
+            youtubeIframe.src = ''; 
+
+            if (animationData.type === 'youtube') {
+                youtubeContainer.classList.remove('hidden');
+                youtubeIframe.src = animationData.src;
+            } else { 
+                imgElement.classList.remove('hidden');
+                imgElement.src = animationData.src;
+            }
+
+            textElement.textContent = animationData.text;
+            if (playSound) {
+                speakAndShow(animationData.text);
+            }
+        }
+        
+        function setInitialAnimation() {
+            showAnimation(0, false);
+        }
+        setInitialAnimation();
+
+        let currentSymptomToPractice = '';
+
+        function setPronunciationTarget(buttonEl, symptom) {
+            // 모든 버튼의 선택 스타일 제거
+            document.querySelectorAll('.symptom-btn').forEach(btn => {
+                btn.classList.remove('symptom-btn-selected');
+            });
+            // 클릭된 버튼에만 선택 스타일 적용
+            buttonEl.classList.add('symptom-btn-selected');
+
+            currentSymptomToPractice = symptom;
+            document.getElementById('selected-symptom').textContent = `"${symptom}" 라고 말해보세요.`;
+            const micButton = document.getElementById('mic-btn-symptom');
+            micButton.disabled = false;
+            micButton.textContent = '말하기 시작';
+            // 기존 onclick 핸들러를 제거하고 새로 설정
+            micButton.onclick = () => startPronunciationTest('mic-btn-symptom', 'pron-feedback-symptom', currentSymptomToPractice, 'pron-feedback-details-symptom');
+        }
+
+        function startPronunciationTest(buttonId, feedbackId, correctText, detailsId) {
+            const button = document.getElementById(buttonId);
+            const feedbackEl = document.getElementById(feedbackId);
+            const detailsEl = detailsId ? document.getElementById(detailsId) : null;
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                feedbackEl.textContent = "죄송하지만, 브라우저가 음성 인식을 지원하지 않아요.";
+                feedbackEl.className = "mt-2 text-center font-semibold text-red-500";
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ko-KR';
+
+            button.classList.add('mic-active');
+            button.textContent = '듣고 있어요...';
+            button.disabled = true;
+            feedbackEl.textContent = '';
+            if (detailsEl) detailsEl.classList.add('hidden');
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const cleanedTranscript = transcript.replace(/[\s.,?!]/g, '');
+                const cleanedCorrectText = correctText.replace(/[\s.,?!]/g, '');
+
+                const allFeedbackOptions = {
+                    '배가 아파요': [
+                        { type: 'bae_error', message: '🤔 거의 맞았어요! "배" 발음만 조금 더 연습해볼까요?', mouthTip: '👄 **입 모양:** "배"를 말할 때, 입술을 양옆으로 살짝 당겨서 미소 짓는 것처럼 해보세요.', tongueTip: '👅 **혀 위치:** 혀끝을 아랫니 뒤에 가볍게 대고 발음해 보세요.'},
+                        { type: 'a_error', message: '🤔 아쉬워요! "아파요"의 "아" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** "아"를 말할 때, 입을 동그랗게 크게 벌려주세요.', tongueTip: '👅 **혀 위치:** 혀를 아래로 편안하게 내려놓고 소리를 내보세요.'}
+                    ],
+                    '기침이 나요': [
+                        { type: 'gi_error', message: '🤔 "기침"의 "기" 발음이 조금 아쉬워요.', mouthTip: '👄 **입 모양:** 입술을 살짝 벌리고, 혀의 뒷부분을 입천장 뒤쪽에 붙였다 떼면서 소리를 내보세요.', tongueTip: '👅 **혀 위치:** 혀의 뒷부분(어금니 쪽)을 연구개(말랑한 입천장)에 붙였다가 터뜨리듯 발음해요.'},
+                        { type: 'chim_error', message: '🤔 "기침"의 "침" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** 발음이 끝날 때 입술을 자연스럽게 닫아주세요.', tongueTip: '👅 **혀 위치:** 혀끝을 윗잇몸 뒤쪽에 붙여서 소리를 만들어요.'}
+                    ],
+                    '열이 나요': [
+                        { type: 'yeol_error', message: '🤔 "열" 발음이 조금 아쉬워요.', mouthTip: '👄 **입 모양:** 입술을 동그랗게 앞으로 내밀었다가 옆으로 벌려주세요.', tongueTip: '👅 **혀 위치:** 혀끝을 윗잇몸에 붙였다가 떼면서 발음해요.'}
+                    ],
+                    '콧물이 나요': [
+                        { type: 'kot_error', message: '🤔 "콧물"의 "콧" 발음이 조금 어려웠나요?', mouthTip: '👄 **입 모양:** 입술을 살짝 벌린 상태를 유지해요.', tongueTip: '👅 **혀 위치:** 혀끝을 아랫니 뒤에 대고 코로 소리를 내보세요.'}
+                    ],
+                    '추워요': [
+                        { type: 'chu_error', message: '🤔 "추워요"의 "추" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** 입술을 동그랗게 모아 앞으로 내밀어 주세요.', tongueTip: '👅 **혀 위치:** 혀를 입천장 가까이 두되, 닿지 않게 하세요.'}
+                    ]
+                };
+
+                if (cleanedTranscript === cleanedCorrectText) {
+                    feedbackEl.textContent = '👍 아주 좋아요! 발음이 정확해요.';
+                    feedbackEl.className = "mt-2 text-center font-semibold text-green-600";
+                    if (detailsEl) detailsEl.classList.add('hidden');
+                } else {
+                    const feedbackOptions = allFeedbackOptions[correctText] || [{ message: '🤔 "' + correctText + '"와 조금 다른 것 같아요. 다시 말해볼까요?' }];
+                    const result = feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)];
+                    
+                    feedbackEl.textContent = result.message;
+                    feedbackEl.className = "mt-2 text-center font-semibold text-orange-500";
+
+                    if (result.mouthTip && detailsEl) {
+                        detailsEl.querySelector('[id^="feedback-tip-mouth"]').innerHTML = result.mouthTip;
+                        detailsEl.querySelector('[id^="feedback-tip-tongue"]').innerHTML = result.tongueTip;
+                        detailsEl.classList.remove('hidden');
+                    }
+                }
+            };
+
+            recognition.onend = () => {
+                button.classList.remove('mic-active');
+                button.textContent = '다시 말하기';
+                button.disabled = false;
+            };
+
+            recognition.onerror = (event) => {
+                if (event.error !== 'no-speech') {
+                    feedbackEl.textContent = '음성을 인식하지 못했어요. 다시 시도해 주세요.';
+                    feedbackEl.className = "mt-2 text-center font-semibold text-red-500";
+                }
+                 button.classList.remove('mic-active');
+                button.textContent = '다시 말하기';
+                button.disabled = false;
+            };
+            
+            recognition.start();
+        }
+
+        function fillBlank(word) {
+            const dialogue = document.getElementById('patient-dialogue');
+            const feedback = document.getElementById('review-feedback');
+            dialogue.textContent = `운동장에서 ${word} 넘어졌어요.`;
+            if (word === '뛰다가') {
+                feedback.textContent = '정답이에요! 👍';
+                feedback.className = 'mt-2 h-6 font-bold text-green-600';
+            } else {
+                feedback.textContent = '틀렸어요. 다시 생각해봐요. 🤔';
+                feedback.className = 'mt-2 h-6 font-bold text-red-500';
+            }
+        }
+
+        function checkHospitalAnswer(answer) {
+            const feedback = document.getElementById('hospital-feedback');
+            if (answer === 'correct') {
+                feedback.textContent = '맞았어요! 배가 아플 땐 내과에 가요.';
+                feedback.className = 'mt-4 text-center h-6 font-bold text-xl text-green-600';
+            } else {
+                feedback.textContent = '아쉬워요. 다른 병원일 것 같아요.';
+                feedback.className = 'mt-4 text-center h-6 font-bold text-xl text-red-500';
+            }
+        }
+        
+        const draggableCards = document.querySelectorAll('.draggable-card');
+        const dropZone = document.getElementById('drop-zone');
+        let droppedItems = [];
+
+        draggableCards.forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.id);
+                setTimeout(() => {
+                    e.target.classList.add('hidden');
+                }, 0);
+            });
+
+            card.addEventListener('dragend', (e) => {
+                if (!droppedItems.includes(e.target.id)) {
+                    e.target.classList.remove('hidden');
+                }
+            });
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drop-zone-highlight');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drop-zone-highlight');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drop-zone-highlight');
+            const id = e.dataTransfer.getData('text');
+            const draggedElement = document.getElementById(id);
+            
+            if (draggedElement && !droppedItems.includes(id)) {
+                droppedItems.push(id);
+                const newCard = draggedElement.cloneNode(true);
+                newCard.classList.remove('hidden', 'draggable-card');
+                newCard.removeAttribute('draggable');
+                
+                if (dropZone.innerText === '여기에 카드를 놓으세요') {
+                    dropZone.innerText = '';
+                }
+                dropZone.appendChild(newCard);
+                dropZone.classList.remove('items-center', 'justify-center');
+
+                if (droppedItems.length === 2) {
+                    const feedbackEl = document.getElementById('dnd-feedback');
+                    if (droppedItems[0] === 'drag1' && droppedItems[1] === 'drag2') {
+                        dropZone.classList.add('drop-zone-success');
+                        feedbackEl.innerHTML = '<span class="text-green-600">👍 정답이에요!</span><br>자전거를 타다가 돌과 부딪혔어요.';
+                        speakAndShow('정답이에요!');
+                    } else {
+                        dropZone.classList.add('drop-zone-fail', 'shake-error');
+                        feedbackEl.innerHTML = '<span class="text-red-500">🤔 순서가 틀렸어요. 다시 해보세요!</span>';
+                        speakAndShow('순서가 틀렸어요');
+                        setTimeout(() => resetDragAndDrop(), 1500);
+                    }
+                    document.getElementById('reset-dnd-btn').classList.remove('hidden');
+                }
+            }
+        });
+
+        function resetDragAndDrop() {
+            droppedItems = [];
+            dropZone.innerHTML = '여기에 카드를 놓으세요';
+            if (!dropZone.classList.contains('items-center')) {
+                dropZone.classList.add('items-center', 'justify-center');
+            }
+            dropZone.classList.remove('drop-zone-success', 'drop-zone-fail', 'shake-error');
+            document.getElementById('dnd-feedback').textContent = '';
+            document.getElementById('reset-dnd-btn').classList.add('hidden');
+            draggableCards.forEach(card => card.classList.remove('hidden'));
+        }
+
+        // --- GPT 채팅 시뮬레이션 로직 ---
+        const chatContainer = document.getElementById('chat-container');
+        const chatInput = document.getElementById('user-chat-input');
+        const sendBtn = document.getElementById('chat-send-btn');
+        const micBtn = document.getElementById('chat-mic-btn');
+
+        function addMessageToChat(message, sender) {
+            const messageWrapper = document.createElement('div');
+            const messageBubble = document.createElement('div');
+            
+            messageWrapper.classList.add('flex');
+            messageBubble.textContent = message;
+            messageBubble.classList.add('p-3', 'rounded-lg', 'max-w-xs');
+
+            if (sender === 'user') {
+                messageWrapper.classList.add('justify-end');
+                messageBubble.classList.add('bg-blue-500', 'text-white');
+            } else {
+                messageWrapper.classList.add('justify-start');
+                messageBubble.classList.add('bg-gray-200', 'text-gray-800');
+            }
+            
+            messageWrapper.appendChild(messageBubble);
+            chatContainer.appendChild(messageWrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
+        }
+
+        function getGptResponse(userMessage) {
+            const lowerCaseMessage = userMessage.toLowerCase();
+            if (lowerCaseMessage.includes('배') && lowerCaseMessage.includes('아팠어')) {
+                return '저런, 배가 왜 아팠어요? 혹시 아이스크림을 너무 많이 먹었나요?';
+            } else if (lowerCaseMessage.includes('넘어졌어')) {
+                return '어머나! 어디에서 넘어졌어요? 많이 다쳤어요?';
+            } else if (lowerCaseMessage.includes('머리') && lowerCaseMessage.includes('아팠어')) {
+                return '머리가 아팠군요. 정말 힘들었겠네요. 지금은 괜찮아요?';
+            } else if (lowerCaseMessage.includes('다리') || lowerCaseMessage.includes('무릎')) {
+                return '다리를 다쳤군요. 많이 아팠겠어요. 꼭 조심해야 해요!';
+            } else {
+                return '그랬군요. 더 자세히 이야기해 줄 수 있어요?';
+            }
+        }
+
+        function handleUserMessage() {
+            const message = chatInput.value.trim();
+            if (message === '') return;
+
+            addMessageToChat(message, 'user');
+            chatInput.value = '';
+
+            setTimeout(() => {
+                const gptResponse = getGptResponse(message);
+                addMessageToChat(gptResponse, 'gpt');
+                speakAndShow(gptResponse);
+            }, 1000);
+        }
+
+        sendBtn.addEventListener('click', handleUserMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleUserMessage();
+            }
+        });
+
+        micBtn.addEventListener('click', () => {
+             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                addMessageToChat("죄송하지만, 브라우저가 음성 인식을 지원하지 않아요.", 'gpt');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ko-KR';
+            micBtn.classList.add('mic-active');
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+                handleUserMessage();
+            };
+
+            recognition.onend = () => {
+                micBtn.classList.remove('mic-active');
+            };
+
+            recognition.onerror = (event) => {
+                micBtn.classList.remove('mic-active');
+                addMessageToChat("음성을 인식하지 못했어요. 다시 시도해 주세요.", 'gpt');
+            };
+            
+            recognition.start();
+        });
+
+
+    </script>
+</body>
+</html>
