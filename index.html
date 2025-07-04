@@ -215,9 +215,9 @@
                 <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">활동 3: 병원과 치료</h3>
                 
                 <div class="mb-6 bg-white p-4 rounded-lg shadow">
-                    <h4 class="text-lg font-bold">🎙️ 의사에게 말해보기 </h4>
+                    <h4 class="text-lg font-bold">🎙️ 의사에게 말해보기 <span class="text-xs text-blue-500">(GPT API 연동)</span></h4>
                     <p class="mt-2">"배가 아파요." 라고 말해보세요.</p>
-                    <button id="mic-btn-hospital" class="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600" onclick="startPronunciationTest('mic-btn-hospital', 'pron-feedback-hospital', '배가 아파요', 'pron-feedback-details-hospital')">말하기 시작</button>
+                    <button id="mic-btn-hospital" class="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600" onclick="startPronunciationTestActivity3()">말하기 시작</button>
                     <p id="pron-feedback-hospital" class="mt-2 text-center font-semibold"></p>
                     <div id="pron-feedback-details-hospital" class="hidden mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <h5 class="font-bold text-blue-800">💡 발음 팁!</h5>
@@ -274,21 +274,17 @@
                 </div>
                 <div id="symptom-display" class="mt-4 text-center text-2xl font-bold text-red-600 h-12"></div>
                 <div class="mt-6 bg-white p-4 rounded-lg shadow">
-                    <h4 class="text-lg font-bold">🎙️ 증상 말하기</h4>
+                    <h4 class="text-lg font-bold">🎙️ 증상 말하기 <span class="text-xs text-blue-500">(GPT API 연동)</span></h4>
                     <p class="mt-2">아래 증상 버튼을 누르고, 따라 말해보세요.</p>
                     <div id="symptom-buttons" class="flex gap-2 justify-center mt-2 flex-wrap">
-                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '열이 나요')">열이 나요</button>
-                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '콧물이 나요')">콧물이 나요</button>
-                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '기침이 나요')">기침이 나요</button>
-                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="setPronunciationTarget(this, '추워요')">추워요</button>
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="handleSymptomButtonClick('열이 나요')">열이 나요</button>
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="handleSymptomButtonClick('콧물이 나요')">콧물이 나요</button>
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="handleSymptomButtonClick('기침이 나요')">기침이 나요</button>
+                        <button class="symptom-btn bg-red-200 px-3 py-1 rounded-full text-sm" onclick="handleSymptomButtonClick('추워요')">추워요</button>
                     </div>
-                    <p id="selected-symptom" class="text-center font-bold text-blue-600 my-2 h-6"></p>
-                    <button id="mic-btn-symptom" class="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600" disabled>먼저 증상을 선택하세요</button>
-                    <p id="pron-feedback-symptom" class="mt-2 text-center font-semibold"></p>
-                    <div id="pron-feedback-details-symptom" class="hidden mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
-                        <h5 class="font-bold text-red-800">💡 발음 팁!</h5>
-                        <p id="feedback-tip-mouth-symptom" class="mt-2 text-red-700 flex items-center"></p>
-                        <p id="feedback-tip-tongue-symptom" class="mt-2 text-red-700 flex items-center"></p>
+                    <div class="flex flex-col items-center mt-4">
+                        <p id="pron-feedback-symptom" class="text-center font-bold text-blue-600 my-2 h-6"></p>
+                        <button id="symptom-mic-btn" class="hidden bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 mt-2" onclick="startPronunciationTestActivity4()">말하기 시작</button>
                     </div>
                 </div>
             </div>
@@ -350,7 +346,7 @@
                 <p id="hospital-feedback" class="mt-4 text-center h-6 font-bold text-xl"></p>
                 
                 <div class="mt-8 bg-white p-4 rounded-lg shadow">
-                    <h4 class="text-lg font-bold">나만의 문장 만들기</h4>
+                    <h4 class="text-lg font-bold">나만의 문장 만들기 <span class="text-xs text-blue-500">(GPT API 연동)</span></h4>
                     <p class="mt-2 text-gray-600">자신이 아팠던 경험을 아래에 써보거나 마이크 버튼을 눌러 말해보세요.</p>
                     <div id="chat-container" class="mt-4 border rounded-lg p-4 h-64 overflow-y-auto bg-gray-50 flex flex-col gap-4">
                         <!-- Chat messages will be appended here -->
@@ -450,122 +446,248 @@
 
             currentSymptomToPractice = symptom;
             document.getElementById('selected-symptom').textContent = `"${symptom}" 라고 말해보세요.`;
-            const micButton = document.getElementById('mic-btn-symptom');
+            const micButton = document.getElementById('symptom-mic-btn');
             micButton.disabled = false;
             micButton.textContent = '말하기 시작';
             // 기존 onclick 핸들러를 제거하고 새로 설정
-            micButton.onclick = () => startPronunciationTest('mic-btn-symptom', 'pron-feedback-symptom', currentSymptomToPractice, 'pron-feedback-details-symptom');
+            micButton.onclick = () => startPronunciationTestActivity4(symptom);
         }
 
-        function startPronunciationTest(buttonId, feedbackId, correctText, detailsId) {
-            const button = document.getElementById(buttonId);
-            const feedbackEl = document.getElementById(feedbackId);
-            const detailsEl = detailsId ? document.getElementById(detailsId) : null;
+        // OpenAI API Key를 아래 변수에 입력하세요 (예: const OPENAI_API_KEY = 'sk-...';)
+        const OPENAI_API_KEY = '';
 
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                feedbackEl.textContent = "죄송하지만, 브라우저가 음성 인식을 지원하지 않아요.";
-                feedbackEl.className = "mt-2 text-center font-semibold text-red-500";
+        // ----------- 공통 함수: Whisper 음성 인식 및 GPT 피드백 -----------
+        async function transcribeAudio(audioBlob) {
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'audio.wav');
+            formData.append('model', 'whisper-1');
+            formData.append('language', 'ko');
+            const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+                body: formData
+            });
+            const data = await response.json();
+            return data.text;
+        }
+
+        async function getPronunciationFeedback(userText, targetText) {
+            const prompt = `학생이 "${targetText}"를 말해야 하는데 실제로 "${userText}"라고 말했어. 
+            
+            반드시 한국어 발음만 평가하고, 외국어(한자, 영어, 일본어 등)는 무시해주세요.
+            
+            다음 순서로 정확한 피드백을 제공해주세요:
+            
+            1. 발음 정확도 평가 (퍼센트)
+            2. 실제 인식된 발음 "${userText}"와 목표 발음 "${targetText}"를 비교해서:
+               - 실제로 어떤 부분이 틀렸는지 구체적으로 지적 (예: "배가"에서 '백하' 대신에 '배'로 말해야 해요)
+               - 올바른 발음 방법을 제시 (예: 입을 조금 열어 '배' 소리를 부드럽게 내면 될 거에요)
+            3. 구체적인 교정 방법
+            
+            평가 기준:
+            - 80% 이상: "정말 잘했어요! 발음이 아주 정확해요."
+            - 60-79%: "잘했어요! 조금만 더 연습하면 완벽해요."
+            - 40-59%: "조금 더 노력해요. 천천히 말해보세요."
+            - 40% 미만: "다시 한 번 말해보세요."
+            
+            예시 형식:
+            "40% 정확도에요. '배가'에서 '백하' 대신에 '배'로 말해야 해요. 입을 조금 열어 '배' 소리를 부드럽게 내면 될 거에요."
+            
+            초등학생이 이해하기 쉽게 한두 문장으로 짧고 간결하게 피드백해줘.`;
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        { role: 'system', content: '너는 친절한 한국어 발음 선생님이야. 반드시 한국어만 평가하고, 외국어(한자, 영어, 일본어 등)는 무시하고, 실제 인식된 발음과 목표 발음을 정확히 비교해서, 실제로 틀린 부분을 구체적으로 지적하고, 올바른 발음 방법을 제시하는 피드백을 한두 문장으로 짧고 간결하게 해줘.' },
+                        { role: 'user', content: prompt }
+                    ]
+                })
+            });
+            const data = await response.json();
+            return data.choices[0].message.content.trim();
+        }
+
+        // ----------- 활동 3: 말하기 시작 버튼 클릭 시 '음성 인식중입니다...' 표시 -----------
+        async function startPronunciationTestActivity3() {
+            const button = document.getElementById('mic-btn-hospital');
+            const feedbackEl = document.getElementById('pron-feedback-hospital');
+            button.textContent = '음성 인식중입니다...';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream);
+                let audioChunks = [];
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = async () => {
+                    button.textContent = '말하기 시작';
+                    feedbackEl.textContent = 'AI가 발음 피드백을 생성중입니다...';
+                    try {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const userText = await transcribeAudio(audioBlob);
+                        const feedback = await getPronunciationFeedback(userText, '배가 아파요');
+                        feedbackEl.textContent = feedback;
+                    } catch (e) {
+                        feedbackEl.textContent = '음성 인식 또는 AI 피드백에 실패했습니다.';
+                        setTimeout(() => {
+                            feedbackEl.textContent = '';
+                        }, 3000);
+                    }
+                };
+                mediaRecorder.start();
+                setTimeout(() => { if (mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 3000); // 3초 녹음
+            } catch (e) {
+                button.textContent = '말하기 시작';
+                feedbackEl.textContent = '마이크 사용 권한이 필요합니다.';
+                setTimeout(() => {
+                    feedbackEl.textContent = '';
+                }, 3000);
+            }
+        }
+
+        // ----------- 활동 4: 증상 버튼 안내/말하기 시작 버튼 동작 복원 -----------
+        let selectedSymptomText = '';
+        function handleSymptomButtonClick(targetText) {
+            selectedSymptomText = targetText;
+            const feedbackEl = document.getElementById('pron-feedback-symptom');
+            feedbackEl.textContent = `"${targetText}"라고 말해보세요.`;
+            // '말하기 시작' 버튼 보이기 및 텍스트 초기화
+            const micBtn = document.getElementById('symptom-mic-btn');
+            micBtn.classList.remove('hidden');
+            micBtn.textContent = '말하기 시작';
+        }
+        async function startPronunciationTestActivity4() {
+            const feedbackEl = document.getElementById('pron-feedback-symptom');
+            const micBtn = document.getElementById('symptom-mic-btn');
+            if (!selectedSymptomText) {
+                feedbackEl.textContent = '먼저 증상 버튼을 선택하세요.';
                 return;
             }
+            micBtn.textContent = '음성 인식중입니다...';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(stream);
+                let audioChunks = [];
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = async () => {
+                    micBtn.textContent = '말하기 시작';
+                    feedbackEl.textContent = 'AI가 발음 피드백을 생성중입니다...';
+                    try {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const userText = await transcribeAudio(audioBlob);
+                        const feedback = await getPronunciationFeedback(userText, selectedSymptomText);
+                        feedbackEl.textContent = feedback;
+                    } catch (e) {
+                        feedbackEl.textContent = '음성 인식 또는 AI 피드백에 실패했습니다.';
+                        setTimeout(() => {
+                            feedbackEl.textContent = '';
+                        }, 3000);
+                    }
+                };
+                mediaRecorder.start();
+                setTimeout(() => { if (mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 3000); // 3초 녹음
+            } catch (e) {
+                micBtn.textContent = '말하기 시작';
+                feedbackEl.textContent = '마이크 사용 권한이 필요합니다.';
+                setTimeout(() => {
+                    feedbackEl.textContent = '';
+                }, 3000);
+            }
+        }
 
+        // ----------- 활동 6: ChatGPT 챗봇 (대화 맥락 기억, 한두 문장 제한) -----------
+        let chatHistory = [
+          { role: 'system', content: `너는 초등학생의 아팠던 경험을 친절하게 들어주는 한국인 보건 선생님이야.\n학생이 언제, 어디가, 어떻게 아팠는지 말하면\n- 먼저 공감과 위로를 해주고\n- 실제 학교 보건실에서 할 수 있는 조언(쉬기, 보호자/선생님께 알리기, 병원가기 등)만 한두 문장으로 자연스럽게 해줘.\n- 차, 한약, 민간요법, 음식 등은 권하지 말고, 필요하면 보호자나 선생님, 병원에 알리라고 안내해.\n- 같은 말을 반복하지 마.\n- 너무 기계적이거나 딱딱한 말투는 쓰지 말고, 따뜻하고 자연스러운 한국어로만 답변해줘.\n- 영어, 일본어, 한자 등 외국어는 쓰지 말고, 오직 한국어로만 답변해.\n- 답변은 항상 한두 문장으로 짧고 간결하게 해줘.` }
+        ];
+
+        async function getChatGptResponse(userMessage) {
+            chatHistory.push({ role: 'user', content: userMessage });
+            // 최근 20개만 유지
+            if (chatHistory.length > 21) chatHistory = [chatHistory[0], ...chatHistory.slice(-20)];
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: chatHistory
+                })
+            });
+            const data = await response.json();
+            const gptReply = data.choices[0].message.content.trim();
+            chatHistory.push({ role: 'assistant', content: gptReply });
+            // 최근 20개만 유지
+            if (chatHistory.length > 21) chatHistory = [chatHistory[0], ...chatHistory.slice(-20)];
+            return gptReply;
+        }
+
+        function addMessageToChat(message, sender) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageWrapper = document.createElement('div');
+            const messageBubble = document.createElement('div');
+            messageWrapper.classList.add('flex');
+            messageBubble.textContent = message;
+            messageBubble.classList.add('p-3', 'rounded-lg', 'max-w-xs');
+            if (sender === 'user') {
+                messageWrapper.classList.add('justify-end');
+                messageBubble.classList.add('bg-blue-500', 'text-white');
+            } else {
+                messageWrapper.classList.add('justify-start');
+                messageBubble.classList.add('bg-gray-200', 'text-gray-800');
+            }
+            messageWrapper.appendChild(messageBubble);
+            chatContainer.appendChild(messageWrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function handleUserMessage() {
+            const chatInput = document.getElementById('user-chat-input');
+            const message = chatInput.value.trim();
+            if (message === '') return;
+            addMessageToChat(message, 'user');
+            chatInput.value = '';
+            addMessageToChat('AI가 답변을 생성중입니다...', 'gpt');
+            try {
+                const gptResponse = await getChatGptResponse(message);
+                // 마지막 '생성중' 메시지 교체
+                const chatContainer = document.getElementById('chat-container');
+                chatContainer.removeChild(chatContainer.lastChild);
+                addMessageToChat(gptResponse, 'gpt');
+            } catch (e) {
+                addMessageToChat('AI 답변 생성에 실패했습니다.', 'gpt');
+            }
+        }
+
+        document.getElementById('chat-send-btn').addEventListener('click', handleUserMessage);
+        document.getElementById('user-chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleUserMessage();
+        });
+        // 마이크 버튼은 기존 Web Speech API로 음성 입력만 지원(Whisper로 확장 가능)
+        document.getElementById('chat-mic-btn').addEventListener('click', () => {
+            const chatInput = document.getElementById('user-chat-input');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                addMessageToChat('브라우저가 음성 인식을 지원하지 않아요.', 'gpt');
+                return;
+            }
             const recognition = new SpeechRecognition();
             recognition.lang = 'ko-KR';
-
-            button.classList.add('mic-active');
-            button.textContent = '듣고 있어요...';
-            button.disabled = true;
-            feedbackEl.textContent = '';
-            if (detailsEl) detailsEl.classList.add('hidden');
-
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                // 모든 공백, 마침표, 쉼표, 특수문자 제거 + 소문자 통일
-                const cleanedTranscript = transcript.replace(/[\s.,?!]/g, '').toLowerCase().trim();
-                const cleanedCorrectText = correctText.replace(/[\s.,?!]/g, '').toLowerCase().trim();
-
-                const allFeedbackOptions = {
-                    '배가 아파요': [
-                        { type: 'bae_error', message: '🤔 거의 맞았어요! "배" 발음만 조금 더 연습해볼까요?', mouthTip: '👄 **입 모양:** "배"를 말할 때, 입술을 양옆으로 살짝 당겨서 미소 짓는 것처럼 해보세요.', tongueTip: '👅 **혀 위치:** 혀끝을 아랫니 뒤에 가볍게 대고 발음해 보세요.'},
-                        { type: 'a_error', message: '🤔 아쉬워요! "아파요"의 "아" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** "아"를 말할 때, 입을 동그랗게 크게 벌려주세요.', tongueTip: '👅 **혀 위치:** 혀를 아래로 편안하게 내려놓고 소리를 내보세요.'},
-                    ],
-                    '기침이 나요': [
-                        { type: 'gi_error', message: '🤔 "기침"의 "기" 발음이 조금 아쉬워요.', mouthTip: '👄 **입 모양:** 입술을 살짝 벌리고, 혀의 뒷부분을 입천장 뒤쪽에 붙였다 떼면서 소리를 내보세요.', tongueTip: '👅 **혀 위치:** 혀의 뒷부분(어금니 쪽)을 연구개(말랑한 입천장)에 붙였다가 터뜨리듯 발음해요.'},
-                        { type: 'chim_error', message: '🤔 "기침"의 "침" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** 발음이 끝날 때 입술을 자연스럽게 닫아주세요.', tongueTip: '👅 **혀 위치:** 혀끝을 윗잇몸 뒤쪽에 붙여서 소리를 만들어요.'},
-                    ],
-                    '열이 나요': [
-                        { type: 'yeol_error', message: '🤔 "열" 발음이 조금 아쉬워요.', mouthTip: '👄 **입 모양:** 입술을 동그랗게 앞으로 내밀었다가 옆으로 벌려주세요.', tongueTip: '👅 **혀 위치:** 혀끝을 윗잇몸에 붙였다가 떼면서 발음해요.'}
-                    ],
-                    '콧물이 나요': [
-                        { type: 'kot_error', message: '🤔 "콧물"의 "콧" 발음이 조금 어려웠나요?', mouthTip: '👄 **입 모양:** 입술을 살짝 벌린 상태를 유지해요.', tongueTip: '👅 **혀 위치:** 혀끝을 아랫니 뒤에 대고 코로 소리를 내보세요.'}
-                    ],
-                    '추워요': [
-                        { type: 'chu_error', message: '🤔 "추워요"의 "추" 발음이 조금 달라요.', mouthTip: '👄 **입 모양:** 입술을 동그랗게 모아 앞으로 내밀어 주세요.', tongueTip: '👅 **혀 위치:** 혀를 입천장 가까이 두되, 닿지 않게 하세요.'}
-                    ]
-                };
-
-                if (cleanedTranscript === cleanedCorrectText) {
-                    feedbackEl.textContent = '👍 아주 좋아요! 발음이 정확해요.';
-                    feedbackEl.className = "mt-2 text-center font-semibold text-green-600";
-                    if (detailsEl) detailsEl.classList.add('hidden');
-                } else {
-                    const feedbackOptions = allFeedbackOptions[correctText] || [{ message: '🤔 "' + correctText + '"와 조금 다른 것 같아요. 다시 말해볼까요?' }];
-                    const result = feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)];
-                    
-                    feedbackEl.textContent = result.message;
-                    feedbackEl.className = "mt-2 text-center font-semibold text-orange-500";
-
-                    if (result.mouthTip && detailsEl) {
-                        detailsEl.querySelector('[id^="feedback-tip-mouth"]').innerHTML = result.mouthTip;
-                        detailsEl.querySelector('[id^="feedback-tip-tongue"]').innerHTML = result.tongueTip;
-                        detailsEl.classList.remove('hidden');
-                    }
-                }
+                chatInput.value = transcript;
+                handleUserMessage();
             };
-
-            recognition.onend = () => {
-                button.classList.remove('mic-active');
-                button.textContent = '다시 말하기';
-                button.disabled = false;
+            recognition.onerror = () => {
+                addMessageToChat('음성을 인식하지 못했어요. 다시 시도해 주세요.', 'gpt');
             };
-
-            recognition.onerror = (event) => {
-                if (event.error !== 'no-speech') {
-                    feedbackEl.textContent = '음성을 인식하지 못했어요. 다시 시도해 주세요.';
-                    feedbackEl.className = "mt-2 text-center font-semibold text-red-500";
-                }
-                button.classList.remove('mic-active');
-                button.textContent = '다시 말하기';
-                button.disabled = false;
-            };
-            
             recognition.start();
-        }
+        });
 
-        function fillBlank(word) {
-            const dialogue = document.getElementById('patient-dialogue');
-            const feedback = document.getElementById('review-feedback');
-            dialogue.textContent = `운동장에서 ${word} 넘어졌어요.`;
-            if (word === '뛰다가') {
-                feedback.textContent = '정답이에요! 👍';
-                feedback.className = 'mt-2 h-6 font-bold text-green-600';
-            } else {
-                feedback.textContent = '틀렸어요. 다시 생각해봐요. 🤔';
-                feedback.className = 'mt-2 h-6 font-bold text-red-500';
-            }
-        }
-
-        function checkHospitalAnswer(answer) {
-            const feedback = document.getElementById('hospital-feedback');
-            if (answer === 'correct') {
-                feedback.textContent = '맞았어요! 배가 아플 땐 내과에 가요.';
-                feedback.className = 'mt-4 text-center h-6 font-bold text-xl text-green-600';
-            } else {
-                feedback.textContent = '아쉬워요. 다른 병원일 것 같아요.';
-                feedback.className = 'mt-4 text-center h-6 font-bold text-xl text-red-500';
-            }
-        }
-        
         const draggableCards = document.querySelectorAll('.draggable-card');
         const dropZone = document.getElementById('drop-zone');
         let droppedItems = [];
@@ -641,97 +763,34 @@
             draggableCards.forEach(card => card.classList.remove('hidden'));
         }
 
-        // --- GPT 채팅 시뮬레이션 로직 ---
-        const chatContainer = document.getElementById('chat-container');
-        const chatInput = document.getElementById('user-chat-input');
-        const sendBtn = document.getElementById('chat-send-btn');
-        const micBtn = document.getElementById('chat-mic-btn');
-
-        function addMessageToChat(message, sender) {
-            const messageWrapper = document.createElement('div');
-            const messageBubble = document.createElement('div');
-            
-            messageWrapper.classList.add('flex');
-            messageBubble.textContent = message;
-            messageBubble.classList.add('p-3', 'rounded-lg', 'max-w-xs');
-
-            if (sender === 'user') {
-                messageWrapper.classList.add('justify-end');
-                messageBubble.classList.add('bg-blue-500', 'text-white');
+        // ----------- 활동 5: 낱말카드(빈칸 채우기) & 활동 6: 병원 클릭 피드백 함수 -----------
+        function checkHospitalAnswer(result) {
+            const feedbackEl = document.getElementById('hospital-feedback');
+            if (result === 'correct') {
+                feedbackEl.textContent = '정답이에요! 잘 찾았어요.';
+                feedbackEl.classList.remove('text-red-500');
+                feedbackEl.classList.add('text-green-600');
             } else {
-                messageWrapper.classList.add('justify-start');
-                messageBubble.classList.add('bg-gray-200', 'text-gray-800');
+                feedbackEl.textContent = '아쉬워요! 다시 한 번 생각해보세요.';
+                feedbackEl.classList.remove('text-green-600');
+                feedbackEl.classList.add('text-red-500');
             }
-            
-            messageWrapper.appendChild(messageBubble);
-            chatContainer.appendChild(messageWrapper);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
         }
 
-        function getGptResponse(userMessage) {
-            const lowerCaseMessage = userMessage.toLowerCase();
-            if (lowerCaseMessage.includes('배') && lowerCaseMessage.includes('아팠어')) {
-                return '저런, 배가 왜 아팠어요? 혹시 아이스크림을 너무 많이 먹었나요?';
-            } else if (lowerCaseMessage.includes('넘어졌어')) {
-                return '어머나! 어디에서 넘어졌어요? 많이 다쳤어요?';
-            } else if (lowerCaseMessage.includes('머리') && lowerCaseMessage.includes('아팠어')) {
-                return '머리가 아팠군요. 정말 힘들었겠네요. 지금은 괜찮아요?';
-            } else if (lowerCaseMessage.includes('다리') || lowerCaseMessage.includes('무릎')) {
-                return '다리를 다쳤군요. 많이 아팠겠어요. 꼭 조심해야 해요!';
+        function fillBlank(word) {
+            const dialogue = document.getElementById('patient-dialogue');
+            const feedback = document.getElementById('review-feedback');
+            dialogue.textContent = `운동장에서 ${word} 넘어졌어요.`;
+            if (word === '뛰다가') {
+                feedback.textContent = '정답이에요!';
+                feedback.classList.remove('text-red-500');
+                feedback.classList.add('text-green-600');
             } else {
-                return '그랬군요. 더 자세히 이야기해 줄 수 있어요?';
+                feedback.textContent = '아쉬워요! 다시 선택해보세요.';
+                feedback.classList.remove('text-green-600');
+                feedback.classList.add('text-red-500');
             }
         }
-
-        function handleUserMessage() {
-            const message = chatInput.value.trim();
-            if (message === '') return;
-
-            addMessageToChat(message, 'user');
-            chatInput.value = '';
-
-            setTimeout(() => {
-                const gptResponse = getGptResponse(message);
-                addMessageToChat(gptResponse, 'gpt');
-                speakAndShow(gptResponse);
-            }, 1000);
-        }
-
-        sendBtn.addEventListener('click', handleUserMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleUserMessage();
-            }
-        });
-
-        micBtn.addEventListener('click', () => {
-             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                addMessageToChat("죄송하지만, 브라우저가 음성 인식을 지원하지 않아요.", 'gpt');
-                return;
-            }
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ko-KR';
-            micBtn.classList.add('mic-active');
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                chatInput.value = transcript;
-                handleUserMessage();
-            };
-
-            recognition.onend = () => {
-                micBtn.classList.remove('mic-active');
-            };
-
-            recognition.onerror = (event) => {
-                micBtn.classList.remove('mic-active');
-                addMessageToChat("음성을 인식하지 못했어요. 다시 시도해 주세요.", 'gpt');
-            };
-            
-            recognition.start();
-        });
 
     </script>
 </body>
